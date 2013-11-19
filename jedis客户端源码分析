@@ -1,0 +1,5 @@
+jedis客户端源码分析：
+
+1：redis协议规定： http://www.redis.cn/topics/protocol.html
+
+2：jedis
