@@ -4,8 +4,8 @@ import redis.clients.util.Slowlog;
 
 import java.util.List;
 
-
 public interface AdvancedJedisCommands {
+
     List<String> configGet(String pattern);
 
     String configSet(String parameter, String value);

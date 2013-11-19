@@ -10,14 +10,14 @@ import redis.clients.jedis.exceptions.JedisDataException;
  */
 public class Transaction extends MultiKeyPipelineBase {
 
-    protected boolean inTransaction = true;
+    protected boolean inTransaction=true;
 
-    protected Transaction(){
+    protected Transaction() {
         // client will be set later in transaction block
     }
 
     public Transaction(final Client client) {
-        this.client = client;
+        this.client=client;
     }
 
     @Override
@@ -34,15 +34,15 @@ public class Transaction extends MultiKeyPipelineBase {
         client.exec();
         client.getAll(1); // Discard all but the last reply
 
-        List<Object> unformatted = client.getObjectMultiBulkReply();
-        if (unformatted == null) {
+        List<Object> unformatted=client.getObjectMultiBulkReply();
+        if(unformatted == null) {
             return null;
         }
-        List<Object> formatted = new ArrayList<Object>();
-        for (Object o : unformatted) {
+        List<Object> formatted=new ArrayList<Object>();
+        for(Object o: unformatted) {
             try {
                 formatted.add(generateResponse(o).get());
-            } catch (JedisDataException e) {
+            } catch(JedisDataException e) {
                 formatted.add(e);
             }
         }
@@ -53,12 +53,12 @@ public class Transaction extends MultiKeyPipelineBase {
         client.exec();
         client.getAll(1); // Discard all but the last reply
 
-        List<Object> unformatted = client.getObjectMultiBulkReply();
-        if (unformatted == null) {
+        List<Object> unformatted=client.getObjectMultiBulkReply();
+        if(unformatted == null) {
             return null;
         }
-        List<Response<?>> response = new ArrayList<Response<?>>();
-        for (Object o : unformatted) {
+        List<Response<?>> response=new ArrayList<Response<?>>();
+        for(Object o: unformatted) {
             response.add(generateResponse(o));
         }
         return response;
@@ -67,7 +67,7 @@ public class Transaction extends MultiKeyPipelineBase {
     public String discard() {
         client.discard();
         client.getAll(1); // Discard all but the last reply
-        inTransaction = false;
+        inTransaction=false;
         clean();
         return client.getStatusCodeReply();
     }

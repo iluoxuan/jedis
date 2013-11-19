@@ -7,6 +7,10 @@ import org.apache.commons.pool.impl.GenericObjectPool.Config;
 
 import redis.clients.util.Pool;
 
+/**
+ * jedis的连接池 从池中获取jedis客户端对象
+ * @author lijunqing
+ */
 public class JedisPool extends Pool<Jedis> {
 
     public JedisPool(final Config poolConfig, final String host) {
@@ -18,32 +22,31 @@ public class JedisPool extends Pool<Jedis> {
     }
 
     public JedisPool(final String host) {
-	URI uri = URI.create(host);
-	if (uri.getScheme() != null && uri.getScheme().equals("redis")) {
-	    String h = uri.getHost();
-	    int port = uri.getPort();
-	    String password = uri.getUserInfo().split(":", 2)[1];
-	    int database = Integer.parseInt(uri.getPath().split("/", 2)[1]);
-	    this.internalPool = new GenericObjectPool(new JedisFactory(h, port,
-		    Protocol.DEFAULT_TIMEOUT, password, database), new Config());
-	} else {
-	    this.internalPool = new GenericObjectPool(new JedisFactory(host,
-		    Protocol.DEFAULT_PORT, Protocol.DEFAULT_TIMEOUT, null,
-		    Protocol.DEFAULT_DATABASE), new Config());
-	}
+        URI uri=URI.create(host);
+        if(uri.getScheme() != null && uri.getScheme().equals("redis")) {
+            String h=uri.getHost();
+            int port=uri.getPort();
+            String password=uri.getUserInfo().split(":", 2)[1];
+            int database=Integer.parseInt(uri.getPath().split("/", 2)[1]);
+            this.internalPool=
+                new GenericObjectPool(new JedisFactory(h, port, Protocol.DEFAULT_TIMEOUT, password, database), new Config());
+        } else {
+            this.internalPool=
+                new GenericObjectPool(new JedisFactory(host, Protocol.DEFAULT_PORT, Protocol.DEFAULT_TIMEOUT, null,
+                    Protocol.DEFAULT_DATABASE), new Config());
+        }
     }
 
     public JedisPool(final URI uri) {
-	String h = uri.getHost();
-	int port = uri.getPort();
-	String password = uri.getUserInfo().split(":", 2)[1];
-	int database = Integer.parseInt(uri.getPath().split("/", 2)[1]);
-	this.internalPool = new GenericObjectPool(new JedisFactory(h, port,
-		Protocol.DEFAULT_TIMEOUT, password, database), new Config());
+        String h=uri.getHost();
+        int port=uri.getPort();
+        String password=uri.getUserInfo().split(":", 2)[1];
+        int database=Integer.parseInt(uri.getPath().split("/", 2)[1]);
+        this.internalPool=
+            new GenericObjectPool(new JedisFactory(h, port, Protocol.DEFAULT_TIMEOUT, password, database), new Config());
     }
-    
-    public JedisPool(final Config poolConfig, final String host, int port,
-            int timeout, final String password) {
+
+    public JedisPool(final Config poolConfig, final String host, int port, int timeout, final String password) {
         this(poolConfig, host, port, timeout, password, Protocol.DEFAULT_DATABASE);
     }
 
@@ -55,17 +58,15 @@ public class JedisPool extends Pool<Jedis> {
         this(poolConfig, host, port, timeout, null, Protocol.DEFAULT_DATABASE);
     }
 
-    public JedisPool(final Config poolConfig, final String host, int port, int timeout, final String password,
-                     final int database) {
+    public JedisPool(final Config poolConfig, final String host, int port, int timeout, final String password, final int database) {
         super(poolConfig, new JedisFactory(host, port, timeout, password, database));
     }
 
-
     public void returnBrokenResource(final BinaryJedis resource) {
-    	returnBrokenResourceObject(resource);
+        returnBrokenResourceObject(resource);
     }
-    
+
     public void returnResource(final BinaryJedis resource) {
-    	returnResourceObject(resource);
-    }   
+        returnResourceObject(resource);
+    }
 }

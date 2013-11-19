@@ -4,18 +4,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-abstract class MultiKeyPipelineBase extends PipelineBase implements
-        BasicRedisPipeline,
-        MultiKeyBinaryRedisPipeline,
+abstract class MultiKeyPipelineBase extends PipelineBase implements BasicRedisPipeline, MultiKeyBinaryRedisPipeline,
         MultiKeyCommandsPipeline {
 
-    protected Client client = null;
+    protected Client client=null;
 
     public Response<List<String>> brpop(String... args) {
         client.brpop(args);
         return getResponse(BuilderFactory.STRING_LIST);
     }
-    
+
     public Response<List<String>> brpop(int timeout, String... keys) {
         client.brpop(timeout, keys);
         return getResponse(BuilderFactory.STRING_LIST);
@@ -25,12 +23,12 @@ abstract class MultiKeyPipelineBase extends PipelineBase implements
         client.blpop(args);
         return getResponse(BuilderFactory.STRING_LIST);
     }
-    
+
     public Response<List<String>> blpop(int timeout, String... keys) {
         client.blpop(timeout, keys);
         return getResponse(BuilderFactory.STRING_LIST);
     }
-    
+
     public Response<Map<String, String>> blpopMap(int timeout, String... keys) {
         client.blpop(timeout, keys);
         return getResponse(BuilderFactory.STRING_MAP);
@@ -40,12 +38,12 @@ abstract class MultiKeyPipelineBase extends PipelineBase implements
         client.brpop(args);
         return getResponse(BuilderFactory.BYTE_ARRAY_LIST);
     }
-    
+
     public Response<List<String>> brpop(int timeout, byte[]... keys) {
         client.brpop(timeout, keys);
         return getResponse(BuilderFactory.STRING_LIST);
     }
-    
+
     public Response<Map<String, String>> brpopMap(int timeout, String... keys) {
         client.blpop(timeout, keys);
         return getResponse(BuilderFactory.STRING_MAP);
@@ -55,7 +53,7 @@ abstract class MultiKeyPipelineBase extends PipelineBase implements
         client.blpop(args);
         return getResponse(BuilderFactory.BYTE_ARRAY_LIST);
     }
-    
+
     public Response<List<String>> blpop(int timeout, byte[]... keys) {
         client.blpop(timeout, keys);
         return getResponse(BuilderFactory.STRING_LIST);
@@ -191,14 +189,12 @@ abstract class MultiKeyPipelineBase extends PipelineBase implements
         return getResponse(BuilderFactory.LONG);
     }
 
-    public Response<Long> sort(String key,
-                                       SortingParams sortingParameters, String dstkey) {
+    public Response<Long> sort(String key, SortingParams sortingParameters, String dstkey) {
         client.sort(key, sortingParameters, dstkey);
         return getResponse(BuilderFactory.LONG);
     }
 
-    public Response<Long> sort(byte[] key,
-                                       SortingParams sortingParameters, byte[] dstkey) {
+    public Response<Long> sort(byte[] key, SortingParams sortingParameters, byte[] dstkey) {
         client.sort(key, sortingParameters, dstkey);
         return getResponse(BuilderFactory.LONG);
     }
@@ -253,14 +249,12 @@ abstract class MultiKeyPipelineBase extends PipelineBase implements
         return getResponse(BuilderFactory.LONG);
     }
 
-    public Response<Long> zinterstore(String dstkey, ZParams params,
-                                      String... sets) {
+    public Response<Long> zinterstore(String dstkey, ZParams params, String... sets) {
         client.zinterstore(dstkey, params, sets);
         return getResponse(BuilderFactory.LONG);
     }
 
-    public Response<Long> zinterstore(byte[] dstkey, ZParams params,
-                                      byte[]... sets) {
+    public Response<Long> zinterstore(byte[] dstkey, ZParams params, byte[]... sets) {
         client.zinterstore(dstkey, params, sets);
         return getResponse(BuilderFactory.LONG);
     }
@@ -275,14 +269,12 @@ abstract class MultiKeyPipelineBase extends PipelineBase implements
         return getResponse(BuilderFactory.LONG);
     }
 
-    public Response<Long> zunionstore(String dstkey, ZParams params,
-                                      String... sets) {
+    public Response<Long> zunionstore(String dstkey, ZParams params, String... sets) {
         client.zunionstore(dstkey, params, sets);
         return getResponse(BuilderFactory.LONG);
     }
 
-    public Response<Long> zunionstore(byte[] dstkey, ZParams params,
-                                      byte[]... sets) {
+    public Response<Long> zunionstore(byte[] dstkey, ZParams params, byte[]... sets) {
         client.zunionstore(dstkey, params, sets);
         return getResponse(BuilderFactory.LONG);
     }
@@ -307,14 +299,12 @@ abstract class MultiKeyPipelineBase extends PipelineBase implements
         return getResponse(BuilderFactory.STRING);
     }
 
-    public Response<String> brpoplpush(String source, String destination,
-                                       int timeout) {
+    public Response<String> brpoplpush(String source, String destination, int timeout) {
         client.brpoplpush(source, destination, timeout);
         return getResponse(BuilderFactory.STRING);
     }
 
-    public Response<byte[]> brpoplpush(byte[] source, byte[] destination,
-                                       int timeout) {
+    public Response<byte[]> brpoplpush(byte[] source, byte[] destination, int timeout) {
         client.brpoplpush(source, destination, timeout);
         return getResponse(BuilderFactory.BYTE_ARRAY);
     }

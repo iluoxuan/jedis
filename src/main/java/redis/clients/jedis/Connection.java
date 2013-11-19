@@ -15,14 +15,28 @@ import redis.clients.util.RedisInputStream;
 import redis.clients.util.RedisOutputStream;
 import redis.clients.util.SafeEncoder;
 
+/**
+ * jedis连接对象
+ * @author lijunqing
+ *
+ */
 public class Connection {
+    
+    //服务器ip
     private String host;
-    private int port = Protocol.DEFAULT_PORT;
+    
+    //默认端口
+    private int port=Protocol.DEFAULT_PORT;
+
     private Socket socket;
+
     private RedisOutputStream outputStream;
+
     private RedisInputStream inputStream;
-    private int pipelinedCommands = 0;
-    private int timeout = Protocol.DEFAULT_TIMEOUT;
+
+    private int pipelinedCommands=0;
+
+    private int timeout=Protocol.DEFAULT_TIMEOUT;
 
     public Socket getSocket() {
         return socket;
@@ -33,17 +47,17 @@ public class Connection {
     }
 
     public void setTimeout(final int timeout) {
-        this.timeout = timeout;
+        this.timeout=timeout;
     }
 
     public void setTimeoutInfinite() {
         try {
             if(!isConnected()) {
-        	connect();
+                connect();
             }
             socket.setKeepAlive(true);
             socket.setSoTimeout(0);
-        } catch (SocketException ex) {
+        } catch(SocketException ex) {
             throw new JedisException(ex);
         }
     }
@@ -52,28 +66,28 @@ public class Connection {
         try {
             socket.setSoTimeout(timeout);
             socket.setKeepAlive(false);
-        } catch (SocketException ex) {
+        } catch(SocketException ex) {
             throw new JedisException(ex);
         }
     }
 
     public Connection(final String host) {
         super();
-        this.host = host;
+        this.host=host;
     }
 
     protected void flush() {
         try {
             outputStream.flush();
-        } catch (IOException e) {
+        } catch(IOException e) {
             throw new JedisConnectionException(e);
         }
     }
 
     protected Connection sendCommand(final Command cmd, final String... args) {
-        final byte[][] bargs = new byte[args.length][];
-        for (int i = 0; i < args.length; i++) {
-            bargs[i] = SafeEncoder.encode(args[i]);
+        final byte[][] bargs=new byte[args.length][];
+        for(int i=0; i < args.length; i++) {
+            bargs[i]=SafeEncoder.encode(args[i]);
         }
         return sendCommand(cmd, bargs);
     }
@@ -84,7 +98,7 @@ public class Connection {
         pipelinedCommands++;
         return this;
     }
-    
+
     protected Connection sendCommand(final Command cmd) {
         connect();
         Protocol.sendCommand(outputStream, cmd, new byte[0][]);
@@ -94,8 +108,8 @@ public class Connection {
 
     public Connection(final String host, final int port) {
         super();
-        this.host = host;
-        this.port = port;
+        this.host=host;
+        this.port=port;
     }
 
     public String getHost() {
@@ -103,7 +117,7 @@ public class Connection {
     }
 
     public void setHost(final String host) {
-        this.host = host;
+        this.host=host;
     }
 
     public int getPort() {
@@ -111,59 +125,58 @@ public class Connection {
     }
 
     public void setPort(final int port) {
-        this.port = port;
+        this.port=port;
     }
 
     public Connection() {
-    	
+
     }
 
     public void connect() {
-        if (!isConnected()) {
+        if(!isConnected()) {
             try {
-                socket = new Socket();
-                //->@wjw_add
+                socket=new Socket();
+                // ->@wjw_add
                 socket.setReuseAddress(true);
-                socket.setKeepAlive(true);  //Will monitor the TCP connection is valid
-                socket.setTcpNoDelay(true);  //Socket buffer Whetherclosed, to ensure timely delivery of data
-                socket.setSoLinger(true,0);  //Control calls close () method, the underlying socket is closed immediately
-                //<-@wjw_add
+                socket.setKeepAlive(true); // Will monitor the TCP connection is valid
+                socket.setTcpNoDelay(true); // Socket buffer Whetherclosed, to ensure timely delivery of data
+                socket.setSoLinger(true, 0); // Control calls close () method, the underlying socket is closed immediately
+                // <-@wjw_add
 
                 socket.connect(new InetSocketAddress(host, port), timeout);
                 socket.setSoTimeout(timeout);
-                outputStream = new RedisOutputStream(socket.getOutputStream());
-                inputStream = new RedisInputStream(socket.getInputStream());
-            } catch (IOException ex) {
+                outputStream=new RedisOutputStream(socket.getOutputStream());
+                inputStream=new RedisInputStream(socket.getInputStream());
+            } catch(IOException ex) {
                 throw new JedisConnectionException(ex);
             }
         }
     }
 
     public void disconnect() {
-        if (isConnected()) {
+        if(isConnected()) {
             try {
                 inputStream.close();
                 outputStream.close();
-                if (!socket.isClosed()) {
+                if(!socket.isClosed()) {
                     socket.close();
                 }
-            } catch (IOException ex) {
+            } catch(IOException ex) {
                 throw new JedisConnectionException(ex);
             }
         }
     }
 
     public boolean isConnected() {
-        return socket != null && socket.isBound() && !socket.isClosed()
-                && socket.isConnected() && !socket.isInputShutdown()
-                && !socket.isOutputShutdown();
+        return socket != null && socket.isBound() && !socket.isClosed() && socket.isConnected() && !socket.isInputShutdown()
+            && !socket.isOutputShutdown();
     }
 
     protected String getStatusCodeReply() {
         flush();
         pipelinedCommands--;
-        final byte[] resp = (byte[]) Protocol.read(inputStream);
-        if (null == resp) {
+        final byte[] resp=(byte[])Protocol.read(inputStream);
+        if(null == resp) {
             return null;
         } else {
             return SafeEncoder.encode(resp);
@@ -171,8 +184,8 @@ public class Connection {
     }
 
     public String getBulkReply() {
-        final byte[] result = getBinaryBulkReply();
-        if (null != result) {
+        final byte[] result=getBinaryBulkReply();
+        if(null != result) {
             return SafeEncoder.encode(result);
         } else {
             return null;
@@ -182,13 +195,13 @@ public class Connection {
     public byte[] getBinaryBulkReply() {
         flush();
         pipelinedCommands--;
-        return (byte[]) Protocol.read(inputStream);
+        return (byte[])Protocol.read(inputStream);
     }
 
     public Long getIntegerReply() {
         flush();
         pipelinedCommands--;
-        return (Long) Protocol.read(inputStream);
+        return (Long)Protocol.read(inputStream);
     }
 
     public List<String> getMultiBulkReply() {
@@ -199,21 +212,21 @@ public class Connection {
     public List<byte[]> getBinaryMultiBulkReply() {
         flush();
         pipelinedCommands--;
-        return (List<byte[]>) Protocol.read(inputStream);
+        return (List<byte[]>)Protocol.read(inputStream);
     }
 
     @SuppressWarnings("unchecked")
     public List<Object> getObjectMultiBulkReply() {
         flush();
         pipelinedCommands--;
-        return (List<Object>) Protocol.read(inputStream);
+        return (List<Object>)Protocol.read(inputStream);
     }
-    
+
     @SuppressWarnings("unchecked")
     public List<Long> getIntegerMultiBulkReply() {
         flush();
         pipelinedCommands--;
-        return (List<Long>) Protocol.read(inputStream);
+        return (List<Long>)Protocol.read(inputStream);
     }
 
     public List<Object> getAll() {
@@ -221,14 +234,14 @@ public class Connection {
     }
 
     public List<Object> getAll(int except) {
-        List<Object> all = new ArrayList<Object>();
+        List<Object> all=new ArrayList<Object>();
         flush();
-        while (pipelinedCommands > except) {
-        	try{
+        while(pipelinedCommands > except) {
+            try {
                 all.add(Protocol.read(inputStream));
-        	}catch(JedisDataException e){
-        		all.add(e);
-        	}
+            } catch(JedisDataException e) {
+                all.add(e);
+            }
             pipelinedCommands--;
         }
         return all;
